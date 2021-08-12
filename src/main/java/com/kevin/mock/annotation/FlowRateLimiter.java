@@ -17,6 +17,6 @@ public @interface FlowRateLimiter {
      * @author: kevinLiu
      * @date: 2021/8/3
      */
-    String message() default  "服务器繁忙，请稍后重试";;
+    String message() default  "服务器繁忙，请稍后重试";
 
 }

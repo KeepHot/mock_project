@@ -27,8 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import javax.annotation.PostConstruct;
-
 import static com.kevin.mock.constant.ErrorCode.*;
 import static com.kevin.mock.dto.common.result.ResponseResult.isSuccess;
 
@@ -106,15 +104,15 @@ public class UserServiceImpl implements UserService {
         UserTokenKeyPrefix tokenKey = new UserTokenKeyPrefix(loginUser.getUserId());
 
         //执行lua脚本，以保持原子性
-//        redisService.operateLua(cerStr);
-
-        synchronized (this) {
-            //判断是否存在5个token
-            if (redisService.isExistFiveToken(cerStr)) {
-                redisService.deleteEarliestToken(cerStr);
-            }//删除凭证并放入新凭证
-            redisService.addNewToken(tokenKey, cerStr);
-        }
+        redisService.operateLua(cerStr);
+//
+//        synchronized (this) {
+//            //判断是否存在5个token
+//            if (redisService.isExistFiveToken(cerStr)) {
+//                redisService.deleteEarliestToken(cerStr);
+//            }//删除凭证并放入新凭证
+//            redisService.addNewToken(tokenKey, cerStr);
+//        }
 
         LoginRespDTO respDTO = LoginRespDTO.builder().token(cerStr).
                 expiresIn(tokenKey.getExpireSeconds().toString()).user(loginUser).build();

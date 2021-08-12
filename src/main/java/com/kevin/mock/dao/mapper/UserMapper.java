@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
 
     /**
-     * @param: user
+     * @param: user 注册传入的用户
      * @description: 注册用户是否成功
      * @author: kevinLiu
      * @date: 2021/8/6
@@ -47,11 +47,12 @@ public interface UserMapper {
      */
     Integer updateUserById(UpdateMsgReqDTO updateMsgReqDTO);
     /**
-     * @param: userId
-     * @param: newPassword
+     * @param: updatePwdReqDTO
      * @description: 根据id对密码进行更新
      * @author: kevinLiu
-     * @date: 2021/8/4
+     * @date: 2021/8/12
+     * @throws
+     * @return: java.lang.Integer
      */
     Integer updatePasswordById(UpdatePwdReqDTO updatePwdReqDTO);
 

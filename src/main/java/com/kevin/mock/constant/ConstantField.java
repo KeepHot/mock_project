@@ -26,7 +26,12 @@ public class ConstantField {
     /**
      * Token的后半部分的长度
      */
-    public static final Integer TOKEN_LENGTH = 20;
+    public static final int TOKEN_LENGTH = 20;
+
+    /**
+     * Token的最大个数限制
+     */
+    public static final String TOKEN_MAX_NUMBER = "7";
 
     /**
      * 正则表达式
@@ -36,7 +41,7 @@ public class ConstantField {
     /**
      * Redis 过期时间设置
      */
-    public static final Integer REDIS_EXPIRE_MILLISECOND = 300000;
+    public static final int REDIS_EXPIRE_MILLISECOND = 300000;
     /**
      * Controller 映射总路径
      */

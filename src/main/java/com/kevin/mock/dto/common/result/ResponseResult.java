@@ -30,7 +30,7 @@ public class ResponseResult<T> implements Serializable {
     }
 
     public static ResponseResult error(ErrorCode statusCode) {
-        return new ResponseResult(statusCode, null);
+        return new ResponseResult<>(statusCode, null);
     }
 
     /**

@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import static com.kevin.mock.constant.ConstantField.REDIS_EXPIRE_MILLISECOND;
+import static com.kevin.mock.constant.ConstantField.TOKEN_MAX_NUMBER;
 
 /**
  * @description: 封装的Redis操作类
@@ -210,10 +211,10 @@ public class RedisServiceImpl implements RedisService {
     public void operateLua(String cer) {
         //操作key
         String key = TOKEN_KEY + CertificateUtil.getUserIdByCer(cer);
-        long currentTime = System.currentTimeMillis();
-        redisTemplate.execute(addTokenScript, Collections.singletonList(key),currentTime);
+        //lua脚本的参数，zset的大key，小key，currentTime，最大限制个数
+        redisTemplate.execute(addTokenScript, Collections.singletonList(key),
+                cer,String.valueOf(System.currentTimeMillis()),TOKEN_MAX_NUMBER);
     }
-
 
     /**
      * @param: ipAddress
