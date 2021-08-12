@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kevin.mock.dao.mapper.UserMapper">
+
+    <insert id="registerUser" parameterType="com.kevin.mock.dao.model.User">
+        insert into mock_user (email, pwd_salt, password)
+        values (#{email}, #{pwdSalt}, #{password})
+    </insert>
+
+    <select id="queryUserByEmail" parameterType="String" resultType="com.kevin.mock.dao.model.User">
+        select user_id,
+               email,
+               password,
+               pwd_salt,
+               nickname,
+               address,
+               create_at,
+               update_at
+        from mock_user
+        where email = #{email}
+    </select>
+
+    <select id="queryUserByUserId" parameterType="String" resultType="com.kevin.mock.dao.model.User">
+        select user_id,
+               email,
+               password,
+               pwd_salt,
+               nickname,
+               address,
+               create_at,
+               update_at
+        from mock_user
+        where user_id = #{userId}
+    </select>
+
+    <update id="updateUserById" parameterType="com.kevin.mock.dto.req.UpdateMsgReqDTO">
+        update mock_user
+        set  nickname = #{nickname} ,
+            address = #{address},
+            update_at = NOW()
+        where user_id = #{userId}
+    </update>
+
+    <update id="updatePasswordById" parameterType="com.kevin.mock.dto.req.UpdatePwdReqDTO">
+        update mock_user
+        set password = #{newPassword},
+            update_at = NOW()
+        where user_id = #{userId}
+    </update>
+
+</mapper>

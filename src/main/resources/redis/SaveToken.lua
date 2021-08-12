@@ -1,0 +1,17 @@
+----- 获取key
+--local key = KEYS[1]
+--local token = ARGV[1]
+--local currentTime = ARGV[2]
+--
+-----当前获取当前reids的个数
+--local currentTokenCount = redis.call("zcard", key)
+--
+--if currentTokenCount >= 5  then
+--    ---根据score查询最早的凭证
+--     = redis.call("zremrangebyrank", key, 0, -1)
+--    ---删除最早的凭证
+--    redis.call("zremrangebyrank", key, 0, (0-1-tonumber(size)))
+--else
+--    return currentTokenCount
+--end
+--redis.call("zadd",key,token,currentTime)
