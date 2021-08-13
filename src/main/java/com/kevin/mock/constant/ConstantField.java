@@ -22,6 +22,10 @@ public class ConstantField {
      * Http协议的 X_AUTHORIZATION 请求头
      */
     public static final String X_AUTHORIZATION = "x_authorization";
+    /**
+     * Http协议的content类型
+     */
+    public static final String HTTP_MEDIA_TYPE = "application/json";
 
     /**
      * Token的后半部分的长度
@@ -31,7 +35,7 @@ public class ConstantField {
     /**
      * Token的最大个数限制
      */
-    public static final String TOKEN_MAX_NUMBER = "7";
+    public static final String TOKEN_MAX_NUMBER = "5";
 
     /**
      * 正则表达式

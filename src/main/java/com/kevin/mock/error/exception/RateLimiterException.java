@@ -6,7 +6,6 @@ package com.kevin.mock.error.exception;
  * @date: 2021/8/10
  */
 public class RateLimiterException extends RuntimeException{
-    private String message;
     public RateLimiterException(String message){
         super(message);
     }

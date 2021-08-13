@@ -1,26 +1,19 @@
 package com.kevin.mock.error.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kevin.mock.constant.ErrorCode;
 import com.kevin.mock.dto.common.result.ResponseResult;
 import com.kevin.mock.error.exception.BizException;
 import com.kevin.mock.error.exception.IpAddressAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.Response;
-import org.springframework.validation.BindException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Locale;
 
 import static com.kevin.mock.constant.ConstantField.*;
 
@@ -35,6 +28,23 @@ import static com.kevin.mock.constant.ConstantField.*;
 public class GlobalExceptionHandler {
 
 
+    /**
+     * @param: exception
+     * @description: JSON数据类型不可读
+     * @author: kevinLiu
+     * @date: 2021/8/11
+     * @return: com.kevin.mock.dto.common.result.ResponseResult
+     */
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public Response exceptionHandler(HttpServletRequest request,HttpMessageNotReadableException exception) {
+        //获取参数默认的信息
+        log.error("HttpMessageNotReadableException occurs:HttpRequest:{}.Token:{}.Current system time:{}.Thread information:{}.HttpMessageNotReadableException:}",
+                request,request.getHeader(X_AUTHORIZATION),System.currentTimeMillis(), Thread.currentThread().getName(), exception);
+        Response response = new Response();
+        response.setStatus(400);
+        return response;
+    }
+
 
     /**
      * @param: exception
@@ -46,10 +56,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     public Response exceptionHandler(HttpServletRequest request,HttpMediaTypeNotSupportedException exception) {
         //获取参数默认的信息
-        log.error("MediaTypeNotSupport occurs:HttpRequest:{}.Current system time:{}.Thread information:{}.MediaNotSupportMessage:{}",
-                request,new Date(), Thread.currentThread().getName(), exception);
+        log.error("MediaTypeNotSupport occurs:HttpRequest:{}.Token:{}.Current system time:{}.Thread information:{}.MediaNotSupportMessage:",
+                request,request.getHeader(X_AUTHORIZATION),System.currentTimeMillis(), Thread.currentThread().getName(), exception);
         Response response = new Response();
-        response.setStatus(415);
         return response;
     }
 
@@ -61,11 +70,11 @@ public class GlobalExceptionHandler {
      * @date: 2021/8/6
      */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseResult exceptionHandler(HttpServletRequest request, MethodArgumentNotValidException bindException) {
+    public ResponseResult<JSONObject> exceptionHandler(HttpServletRequest request, MethodArgumentNotValidException bindException) {
         //获取参数默认的信息
         String defaultMessage = bindException.getBindingResult().getFieldError().getDefaultMessage();
-        log.error("parameter bind exception occurs:HttpRequest:{}. Current system time:{}.Thread information:{}.BindParameterMessage:{}.BindExceptionMsg:{}",
-                request ,new Date(), Thread.currentThread().getName(), defaultMessage, bindException);
+        log.error("parameter bind exception occurs:HttpRequest:{}.Token:{}.Current system time:{}.Thread information:{}.BindParameterMessage:{}.BindExceptionMsg:",
+                request ,request.getHeader(X_AUTHORIZATION),System.currentTimeMillis(),System.currentTimeMillis(), defaultMessage, bindException);
         //从map中获取ErrorCode来进行
         ErrorCode errorCode = messageMap.get(defaultMessage);
         if (errorCode != null) {
@@ -82,9 +91,9 @@ public class GlobalExceptionHandler {
      * @return: com.kevin.mock.dto.common.result.ResponseResult
      */
     @ExceptionHandler(value = BizException.class)
-    public ResponseResult exceptionHandler(HttpServletRequest request,BizException bizException) {
-        log.error("bizException occurs:HttpRequest:{}.Current system time:{}.Thread information:{}.StackMessage:{}",
-                request,new Date(), Thread.currentThread().getName(), bizException);
+    public ResponseResult<JSONObject> exceptionHandler(HttpServletRequest request, BizException bizException) {
+        log.error("bizException occurs:HttpRequest:{}.Token:{}.Current system time:{}.Thread information:{}.StackMessage:",
+                request,request.getHeader(X_AUTHORIZATION),System.currentTimeMillis(), Thread.currentThread().getName(), bizException);
         return ResponseResult.error(ErrorCode.EMAIL_HAS_REGISTERED);
     }
 
@@ -96,11 +105,10 @@ public class GlobalExceptionHandler {
      * @return: com.kevin.mock.dto.common.result.ResponseResult
      */
     @ExceptionHandler(value = IpAddressAccessException.class)
-    public ResponseResult exceptionHandler(HttpServletRequest request,IpAddressAccessException ipAddressAccessException) {
-        log.error("ipAddressAccess exception occurs:HttpRequest:{}.Current system time:{}.Thread information:{}." +
-                        "StackMessage:{}.IPAddress:{}.AccessCount:{}",
-                request,new Date(), Thread.currentThread().getName(), ipAddressAccessException,
-                ipAddressAccessException.getIpAddress(), ipAddressAccessException.getCount());
+    public ResponseResult<JSONObject> exceptionHandler(HttpServletRequest request,IpAddressAccessException ipAddressAccessException) {
+        log.error("ipAddressAccess exception occurs:HttpRequest:{}.Token:{}.Current system time:{}.Thread information:{}.IPAddress:{}.AccessCount:{}.StackMessage:",
+                request,request.getHeader(X_AUTHORIZATION),System.currentTimeMillis(), Thread.currentThread().getName(),
+                ipAddressAccessException.getIpAddress(), ipAddressAccessException.getCount(),ipAddressAccessException);
         return ResponseResult.error(ErrorCode.SERVER_BUSY);
     }
 
@@ -111,9 +119,9 @@ public class GlobalExceptionHandler {
      * @date: 2021/8/5
      */
     @ExceptionHandler(value = Exception.class)
-    public ResponseResult exceptionHandler(HttpServletRequest request,Exception exception) {
-        log.error("unknown exception :HttpRequest:{}.Current system time:{}.Thread information:{}.StackMessage:{}.",
-                request,new Date(), Thread.currentThread().getName(), exception);
+    public ResponseResult<JSONObject> exceptionHandler(HttpServletRequest request,Exception exception) {
+        log.error("unknown exception :HttpRequest:{}.Token:{}.Current system time:{}.Thread information:{}.StackMessage:",
+                request,request.getHeader(X_AUTHORIZATION),System.currentTimeMillis(), Thread.currentThread().getName(), exception);
         return ResponseResult.error(ErrorCode.SERVER_INTERNAL_ERROR);
     }
 }

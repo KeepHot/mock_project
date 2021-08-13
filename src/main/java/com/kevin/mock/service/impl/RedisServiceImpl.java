@@ -1,11 +1,9 @@
 package com.kevin.mock.service.impl;
 
-import com.kevin.mock.service.helper.redis.impl.UserTokenKeyPrefix;
 import com.kevin.mock.service.RedisService;
 import com.kevin.mock.util.CertificateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import static com.kevin.mock.constant.ConstantField.REDIS_EXPIRE_MILLISECOND;
@@ -39,17 +36,26 @@ public class RedisServiceImpl implements RedisService {
 
     private final StringRedisTemplate redisTemplate;
 
-    private DefaultRedisScript<Number> addTokenScript;
-
     public RedisServiceImpl(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
+    private DefaultRedisScript<Number> addTokenScript;
+    private DefaultRedisScript<Boolean> isExpiredScript;
+
+
     @PostConstruct
-    public void initLuaScript() {
+    public void initTokenLuaScript() {
         addTokenScript = new DefaultRedisScript<>();
         addTokenScript.setResultType(Number.class);
         addTokenScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("redis/SaveToken.lua")));
+    }
+
+    @PostConstruct
+    public void initExpireLuaScript() {
+        isExpiredScript = new DefaultRedisScript<>();
+        isExpiredScript.setResultType(Boolean.class);
+        isExpiredScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("redis/isExpired.lua")));
     }
 
     /**
@@ -61,41 +67,6 @@ public class RedisServiceImpl implements RedisService {
     public boolean queryCertificate(String credentials) {
         return redisTemplate.opsForZSet().rank(TOKEN_KEY + CertificateUtil.getUserIdByCer(credentials),
                 credentials) != null;
-    }
-
-    /**
-     * @param: certificationStr
-     * @description: 是否存在5个或者5个以上的K-V
-     * @author: kevinLiu
-     * @date: 2021/8/4
-     */
-    @Override
-    public boolean isExistFiveToken(String certificationStr) {
-        return redisTemplate.opsForZSet().zCard(TOKEN_KEY + CertificateUtil.getUserIdByCer(certificationStr)) >= 5;
-    }
-
-    /**
-     * @description: 删除最早的一个token
-     * @author: kevinLiu
-     * @date: 2021/8/4
-     */
-    @Override
-    public void deleteEarliestToken(String certificationStr) {
-        HashSet set = (HashSet) redisTemplate.opsForZSet().range(TOKEN_KEY +
-                CertificateUtil.getUserIdByCer(certificationStr), 0, -1);
-        redisTemplate.opsForZSet().remove(TOKEN_KEY + CertificateUtil.
-                getUserIdByCer(certificationStr), set.iterator().next());
-    }
-
-    /**
-     * @description: 新增一个token
-     * @author: kevinLiu
-     * @date: 2021/8/4
-     */
-    @Override
-    public void addNewToken(UserTokenKeyPrefix prefix, String cerStr) {
-        log.info(prefix.getPrefix());
-        redisTemplate.opsForZSet().add(prefix.getPrefix(), cerStr, System.currentTimeMillis());
     }
 
     /**
@@ -117,18 +88,10 @@ public class RedisServiceImpl implements RedisService {
      * @date: 2021/8/4
      */
     @Override
-    public boolean isExpiredCertificate(String credentials) {
-        Double expiredTime = redisTemplate.opsForZSet().score(TOKEN_KEY + CertificateUtil.
-                getUserIdByCer(credentials), credentials);
-        long curSystemTime = System.currentTimeMillis();
-        long expiredTimeLong = expiredTime.longValue();
-        boolean flag = expiredTimeLong + REDIS_EXPIRE_MILLISECOND < curSystemTime;
-        //过期则删除该凭证
-        if (flag) {
-            redisTemplate.opsForZSet().remove(TOKEN_KEY + CertificateUtil.
-                    getUserIdByCer(credentials), credentials, System.currentTimeMillis());
-        }
-        return flag;
+    public boolean isExpiredCertificate(String cer) {
+        String key = TOKEN_KEY + CertificateUtil.getUserIdByCer(cer);
+        return redisTemplate.execute(isExpiredScript, Collections.singletonList(key), cer,
+                String.valueOf(System.currentTimeMillis()));
     }
 
     /**
@@ -139,8 +102,7 @@ public class RedisServiceImpl implements RedisService {
      */
     @Override
     public void putBlackList(String ipAddress) {
-        redisTemplate.opsForValue().set(BLANK_LIST + ipAddress, ipAddress);
-        redisTemplate.expire(BLANK_LIST + ipAddress, 60, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(BLANK_LIST + ipAddress, ipAddress, 60, TimeUnit.SECONDS);
     }
 
 
@@ -213,7 +175,7 @@ public class RedisServiceImpl implements RedisService {
         String key = TOKEN_KEY + CertificateUtil.getUserIdByCer(cer);
         //lua脚本的参数，zset的大key，小key，currentTime，最大限制个数
         redisTemplate.execute(addTokenScript, Collections.singletonList(key),
-                cer,String.valueOf(System.currentTimeMillis()),TOKEN_MAX_NUMBER);
+                cer, String.valueOf(System.currentTimeMillis()), TOKEN_MAX_NUMBER);
     }
 
     /**

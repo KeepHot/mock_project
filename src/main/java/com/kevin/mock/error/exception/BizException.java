@@ -8,7 +8,6 @@ package com.kevin.mock.error.exception;
 public class BizException extends RuntimeException {
     private String message;
     private Exception exception;
-
     public BizException(String message, Exception exception) {
         super(message);
         this.exception = exception;

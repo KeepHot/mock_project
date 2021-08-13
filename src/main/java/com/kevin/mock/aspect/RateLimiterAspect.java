@@ -28,7 +28,6 @@ public class RateLimiterAspect {
 
     @Pointcut("@annotation(flowRateLimiter)")
     public void pointCut(FlowRateLimiter flowRateLimiter) {
-
     }
 
     @Around(value = "pointCut(flowRateLimiter)", argNames = "pjp,flowRateLimiter")

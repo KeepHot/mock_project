@@ -1,5 +1,7 @@
 package com.kevin.mock.dao.model;
 
+import com.kevin.mock.dto.req.UpdateMsgReqDTO;
+import com.kevin.mock.dto.req.UpdatePwdReqDTO;
 import lombok.*;
 
 import java.io.Serializable;
@@ -50,4 +52,15 @@ public class User implements Serializable {
      * @description: user的更新时间
      */
     private LocalDateTime updateAt;
+
+    public User(UpdateMsgReqDTO updateMsgReqDTO) {
+        this.userId = Integer.valueOf(updateMsgReqDTO.getUserId());
+        this.address = updateMsgReqDTO.getAddress();
+        this.nickname = updateMsgReqDTO.getNickname();
+    }
+
+    public User(UpdatePwdReqDTO updatePwdReqDTO) {
+        this.userId = Integer.valueOf(updatePwdReqDTO.getUserId());
+        this.password = updatePwdReqDTO.getNewPassword();
+    }
 }

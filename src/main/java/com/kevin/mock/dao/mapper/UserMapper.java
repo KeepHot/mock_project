@@ -45,7 +45,7 @@ public interface UserMapper {
      * @author: kevinLiu
      * @date: 2021/8/4
      */
-    Integer updateUserById(UpdateMsgReqDTO updateMsgReqDTO);
+    Integer updateUserById(User user);
     /**
      * @param: updatePwdReqDTO
      * @description: 根据id对密码进行更新
@@ -54,6 +54,6 @@ public interface UserMapper {
      * @throws
      * @return: java.lang.Integer
      */
-    Integer updatePasswordById(UpdatePwdReqDTO updatePwdReqDTO);
+    Integer updatePasswordById(User user);
 
 }

@@ -23,7 +23,7 @@ public class RegisterRespDTO implements Serializable {
     /**
      * @description: userId
      */
-    private String userId;
+    private Integer userId;
     /**
      * @description: 创建时间
      */

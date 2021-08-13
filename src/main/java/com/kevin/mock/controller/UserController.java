@@ -11,6 +11,7 @@ import com.kevin.mock.dto.resp.RegisterRespDTO;
 import com.kevin.mock.service.UserService;
 import com.kevin.mock.util.HttpRequestUtil;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,8 +44,8 @@ public class UserController {
      */
     @FlowRateLimiter
     @IPAccessLimiter
-    @RequestMapping(value = MAP_REGISTER_PATH, method = RequestMethod.POST, consumes = "application/json")
-    public ResponseResult<RegisterRespDTO> userRegister(@Validated RegisterReqDTO registerReqDTO) {
+    @RequestMapping(value = MAP_REGISTER_PATH, method = RequestMethod.POST, consumes = HTTP_MEDIA_TYPE)
+    public ResponseResult<RegisterRespDTO> userRegister(@RequestBody @Validated RegisterReqDTO registerReqDTO) {
         return userService.registerUser(registerReqDTO);
     }
 
@@ -57,8 +58,8 @@ public class UserController {
      */
     @FlowRateLimiter
     @IPAccessLimiter
-    @RequestMapping(value = MAP_LOGIN_PATH, method = RequestMethod.POST, consumes = "application/json")
-    public ResponseResult userLogin(@Validated LoginReqDTO loginReqDTO) {
+    @RequestMapping(value = MAP_LOGIN_PATH, method = RequestMethod.POST, consumes = HTTP_MEDIA_TYPE)
+    public ResponseResult userLogin(@RequestBody @Validated LoginReqDTO loginReqDTO) {
         return userService.userLogin(loginReqDTO);
     }
 
@@ -71,7 +72,7 @@ public class UserController {
      */
     @FlowRateLimiter
     @IPAccessLimiter
-    @RequestMapping(value = MAP_LOGOUT_PATH, method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = MAP_LOGOUT_PATH, method = RequestMethod.POST, consumes = HTTP_MEDIA_TYPE)
     public ResponseResult userLogout(HttpServletRequest request) {
         String authorizationStr = HttpRequestUtil.getHeadersInfo(request).get(X_AUTHORIZATION);
         return userService.userLogout(authorizationStr);
@@ -86,7 +87,7 @@ public class UserController {
      */
     @FlowRateLimiter
     @IPAccessLimiter
-    @RequestMapping(value = MAP_GET_MSG_PATH, method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = MAP_GET_MSG_PATH, method = RequestMethod.POST, consumes = HTTP_MEDIA_TYPE)
     public ResponseResult getUserInfo(HttpServletRequest request) {
         String authorizationStr = HttpRequestUtil.getHeadersInfo(request).get(X_AUTHORIZATION);
         return userService.getUserInfo(authorizationStr);
@@ -102,10 +103,9 @@ public class UserController {
      */
     @FlowRateLimiter
     @IPAccessLimiter
-    @RequestMapping(value = MAP_UPDATE_MSG_PATH, method = RequestMethod.POST, consumes = "application/json")
-    public ResponseResult updateUserInfo(@Validated UpdateMsgReqDTO updateMsgReqDTO,
+    @RequestMapping(value = MAP_UPDATE_MSG_PATH, method = RequestMethod.POST, consumes = HTTP_MEDIA_TYPE)
+    public ResponseResult updateUserInfo(@RequestBody @Validated UpdateMsgReqDTO updateMsgReqDTO,
                                          HttpServletRequest request) {
-
         String authorizationStr = HttpRequestUtil.getHeadersInfo(request).get(X_AUTHORIZATION);
         return userService.updateUserInfo(authorizationStr, updateMsgReqDTO);
     }
@@ -120,11 +120,10 @@ public class UserController {
      */
     @FlowRateLimiter
     @IPAccessLimiter
-    @RequestMapping(value = MAP_UPDATE_PWD_PATH, method = RequestMethod.POST, consumes = "application/json")
-    public ResponseResult updatePassword( @Validated UpdatePwdReqDTO updatePwdReqDTO,
+    @RequestMapping(value = MAP_UPDATE_PWD_PATH, method = RequestMethod.POST, consumes = HTTP_MEDIA_TYPE)
+    public ResponseResult updatePassword(@RequestBody @Validated UpdatePwdReqDTO updatePwdReqDTO,
                                          HttpServletRequest request) {
         String authorizationStr = HttpRequestUtil.getHeadersInfo(request).get(X_AUTHORIZATION);
         return userService.updatePassword(authorizationStr, updatePwdReqDTO);
-
     }
 }

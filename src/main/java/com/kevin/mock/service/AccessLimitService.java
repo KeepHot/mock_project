@@ -7,7 +7,7 @@ package com.kevin.mock.service;
  */
 public interface AccessLimitService {
     /**
-     * @description: 试图获取令牌
+     * 试图获取令牌
      * @author: kevinLiu
      * @date: 2021/8/10
      * @return: boolean

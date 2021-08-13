@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @description: 登录返回的DTO
@@ -29,8 +30,10 @@ public class LoginRespDTO implements Serializable {
      * @description: token有效期
      */
     private String expiresIn;
-    /**
-     * @description: 用户
-     */
-    private User user;
+    private String userId;
+    private String email;
+    private String nickname;
+    private String address;
+    private String createAt;
+    private String updateAt;
 }

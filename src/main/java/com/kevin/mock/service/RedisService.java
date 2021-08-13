@@ -11,12 +11,6 @@ public interface RedisService {
 
     boolean queryCertificate(String string);
 
-    boolean isExistFiveToken(String certificationStr);
-
-    void deleteEarliestToken(String certificationStr);
-
-    void addNewToken(UserTokenKeyPrefix prefix, String cerStr);
-
     void deleteSpecificToken(String credentials);
 
     boolean isExpiredCertificate(String credentials);

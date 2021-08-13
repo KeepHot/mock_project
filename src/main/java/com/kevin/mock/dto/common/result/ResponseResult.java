@@ -1,5 +1,6 @@
 package com.kevin.mock.dto.common.result;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kevin.mock.constant.ErrorCode;
 import lombok.*;
 
@@ -30,7 +31,7 @@ public class ResponseResult<T> implements Serializable {
     }
 
     public static ResponseResult error(ErrorCode statusCode) {
-        return new ResponseResult<>(statusCode, null);
+        return new ResponseResult<>(statusCode, new JSONObject());
     }
 
     /**

@@ -1,12 +1,12 @@
 package com.kevin.mock.dto.resp;
 
-import com.kevin.mock.dao.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @description: 获取用户信息返回的DTO
@@ -21,8 +21,11 @@ public class GetUserInfoRespDTO implements Serializable {
 
 
     private static final long serialVersionUID = 6882993308930782630L;
-    /**
-     * @description: 用户
-     */
-    private User user;
+
+    private String userId;
+    private String email;
+    private String nickname;
+    private String address;
+    private String createAt;
+    private String updateAt;
 }
